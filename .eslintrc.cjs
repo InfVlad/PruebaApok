@@ -18,9 +18,8 @@ const config = {
   },
   plugins: ['@typescript-eslint'],
   extends: [
-    'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
-    // 'plugin:prettier/recommended',
+    'plugin:react/recommended',
   ],
   rules: {
     '@typescript-eslint/consistent-type-imports': [
@@ -38,8 +37,9 @@ const config = {
       },
     ],
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    'react/react-in-jsx-scope': 'off',  
+    'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',
+    '@typescript-eslint/no-misused-promises': 'off',
   },
 };
 

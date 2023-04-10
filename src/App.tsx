@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import Button from './components/Button';
+import ItemList from './components/ItemList';
 
 /*
 Nodos:
@@ -13,16 +12,12 @@ TODO:
 3. Permitir cambio de idioma (cambia el title)
 4. Crear nodos
 5. Poder eliminar nodos sin hijos.
-
-
 */
 
 function App() {
-
   return (
-    <div className='flex items-center justify-center w-full min-h-screen bg-slate-300'>
-      <div className='text-3xl font-bold text-green-700'>Inicio de prueba</div>
-      <Button text="Nuevo Boton" />
+    <div className='flex items-center justify-center w-full min-h-screen bg-slate-200'>
+      <ItemList />
     </div>
   );
 }

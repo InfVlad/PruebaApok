@@ -1,17 +1,67 @@
 import axios from 'axios';
-import type { Node } from '../types/nodes';
+import type { TNode } from '../types/nodes';
 import type { Language } from '../types/local';
 
-const URL_BASE = 'https://api-graph.tests.grupoapok.com';
+const URL_BASE = 'https://api-graph.tests.grupoapok.com/api';
 
-const getAllNodes = async () => {
-  const response = await axios<Node[]>(`${URL_BASE}/api/nodes`);
-  return response;
+const getParentNodes = async () => {
+  try {
+    const response = await axios<TNode[]>(`${URL_BASE}/nodes`);
+    return response;
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 const getLocals = async () => {
-    const response = await axios<Language>(`${URL_BASE}/api/locales`)
+  try {
+    const response = await axios<Language>(`${URL_BASE}/locales`);
     return response;
-}
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-export { getAllNodes, getLocals };
+const deleteNode = async (id: number) => {
+  try {
+    const response = await axios.delete<TNode>(`${URL_BASE}/node/${id}`);
+    return response;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const getChildNodes = async (id: number) => {
+  try {
+    const response = await axios<TNode[]>(`${URL_BASE}/nodes?parent=${id}`);
+    return response;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const getNode = async (id: number, locale?: string) => {
+  try {
+    const url = locale
+      ? `${URL_BASE}/nodes/${id}?locale=${locale}`
+      : `${URL_BASE}/nodes/${id}`;
+    const response = await axios<TNode[]>(url);
+    return response;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const createNode = async (parentId: number, locales?: string[]) => {
+  try {
+    const response = await axios.post<TNode>(`${URL_BASE}/node`, {
+      parent: parentId,
+      locales,
+    });
+    return response;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export { getParentNodes, getLocals, deleteNode, getChildNodes, getNode, createNode };
