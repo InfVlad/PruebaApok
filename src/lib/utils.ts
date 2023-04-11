@@ -1,6 +1,7 @@
 import axios, { isAxiosError } from 'axios';
 import type { TNode } from '../types/nodes';
 import type { Language } from '../types/local';
+import { toast } from 'react-hot-toast';
 
 const URL_BASE = 'https://api-graph.tests.grupoapok.com/api';
 
@@ -28,7 +29,7 @@ const deleteNode = async (id: number) => {
     return response;
   } catch (err) {
     if (isAxiosError(err) && err.response?.status === 400) {
-      console.log((err.response?.data as { message: string })?.message);
+      toast.error((err.response?.data as { message: string })?.message);
     } else {
       console.error(err);
     }
@@ -41,7 +42,7 @@ const getChildNodes = async (id: number) => {
     return response;
   } catch (err) {
     if (isAxiosError(err) && err.response?.status === 404) {
-      console.log((err.response?.data as { message: string })?.message);
+      toast.error((err.response?.data as { message: string })?.message);
     } else {
       console.error(err);
     }
@@ -51,9 +52,9 @@ const getChildNodes = async (id: number) => {
 const getNode = async (id: number, locale?: string) => {
   try {
     const url = locale
-      ? `${URL_BASE}/nodes/${id}?locale=${locale}`
-      : `${URL_BASE}/nodes/${id}`;
-    const response = await axios<TNode[]>(url);
+      ? `${URL_BASE}/node/${id}?locale=${locale}`
+      : `${URL_BASE}/node/${id}`;
+    const response = await axios<TNode>(url);
     return response;
   } catch (err) {
     console.error(err);

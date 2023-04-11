@@ -10,9 +10,12 @@
     "format": "prettier --write ./src"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^1.0.0-beta.6",
+    "@total-typescript/ts-reset": "^0.4.2",
     "axios": "^1.3.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.0"
   },
   "devDependencies": {
     "@types/eslint": "^8.37.0",

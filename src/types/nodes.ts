@@ -1,4 +1,4 @@
-interface Translation {
+export interface Translation {
     id: number;
     node_id: number;
     locale: string;
@@ -11,5 +11,5 @@ export interface TNode {
     parent: number | null;
     created_at?: Date | null;
     updated_at?: Date | null;
-    translation?: Translation[];
+    translation: Translation[];
 }

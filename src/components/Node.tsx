@@ -1,20 +1,26 @@
-import type { FC, MouseEventHandler } from 'react';
-import { useState } from 'react';
+import type { FC, MouseEventHandler, Dispatch, SetStateAction } from 'react';
+import { useState, useEffect } from 'react';
 import { getChildNodes, createNode, deleteNode } from '../lib/utils';
 import type { TNode } from '../types/nodes';
+import type { Language } from '../types/local';
 import deleteIcon from '../assets/delete.svg';
 import closeIcon from '../assets/close.svg';
 import Loader from './Loader';
+import { toast } from 'react-hot-toast';
+import {useAutoAnimate} from '@formkit/auto-animate/react'
+import LanguageSelector from './LanguageSelector';
 
-interface NodeProps extends TNode {
-  setShowingChild?: React.Dispatch<React.SetStateAction<number | null>>;
-  updateChildList?: React.Dispatch<React.SetStateAction<TNode[]>>;
+interface NodeProps extends Omit<TNode, 'translation'> {
+  setShowingChild?: Dispatch<SetStateAction<number | null>>;
+  updateChildList?: Dispatch<SetStateAction<TNode[]>>;
 }
 
 const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildList }) => {
   const [childList, setChildList] = useState<TNode[]>([]);
   const [showingGrandChild, setShowingGrandChild] = useState<number | null>(null);
   const [loadingChildren, setLoadingChildren] = useState<boolean>(false);
+  const [translatedTitle, setTranslatedTitle] = useState<string | null>(null);
+  const [listRef] = useAutoAnimate<HTMLDivElement>();
 
   const handleShowChildren: MouseEventHandler<HTMLButtonElement> = () => {
     void (async () => {
@@ -24,7 +30,6 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
         setLoadingChildren(false);
         if (!childNodes) return;
         setChildList(childNodes?.data);
-        console.log(childNodes?.data);
         if (setShowingChild) {
           setShowingChild(id);
         }
@@ -44,7 +49,8 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
       try {
         const createdNodeRes = await createNode(id);
         if (createdNodeRes) {
-          console.log(createdNodeRes?.data);
+          toast.success("Node Created Successfully")
+          toast.success(`Node number: ${createdNodeRes?.data.id}`);
         }
       } catch (error) {
         console.error(error);
@@ -59,7 +65,7 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
         if (deletedNodeRes.status !== 200) {
           console.log('Status: ', deletedNodeRes.status);
         }
-        console.log('Successfully deleted node ', deletedNodeRes?.data.id);
+        toast.success(`Node ${deletedNodeRes?.data.id} Deleted Successfully`)
         if (updateChildList) {
           updateChildList((prevList) => prevList.filter((node) => node.id !== id));
         }
@@ -74,6 +80,15 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
       : childList;
   };
 
+useEffect(() => {
+  if(childList.length === 0){
+    setShowingGrandChild(null);
+    if(setShowingChild){
+      setShowingChild(null);
+    }
+  }
+}, [childList])
+
   return (
     <div className='flex flex-col items-center justify-center'>
       <div className='flex flex-col items-center justify-between gap-4 p-8 m-8 bg-white w-64 h-[20rem] sm:w-72 sm:h-[22rem] rounded-3xl'>
@@ -81,6 +96,7 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
           <div className='font-semibold text-blue-600 text-md'>
             <div>{`ID: ${id}`}</div>
             {parent ? <div>{`Parent ID: ${parent}`}</div> : <div>Root</div>}
+            <LanguageSelector id={id} updateTitle={setTranslatedTitle}/>
           </div>
           {parent ? (
             <button
@@ -94,7 +110,7 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
           ) : null}
         </div>
         <p className='w-[85%] text-center font-serif text-lg font-semibold sm:text-xl sm:font-bold text-blue-600'>
-          {title}
+          {translatedTitle? translatedTitle: title}
         </p>
         <div className='flex items-center justify-between w-full gap-4'>
           <button
@@ -117,6 +133,7 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
       </div>
       {childList.length > 0 && (
         <div
+          ref={listRef}
           className={
             'relative flex p-7 items-center justify-center flex-wrap w-[85%] rounded-2xl max-w-[1200px] overflow-auto ' +
             (showingGrandChild ? 'flex-col' : 'bg-blue-300')

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FC } from 'react';
-import { getParentNodes } from '../lib/utils';
+import { getParentNodes, getLocals } from '../lib/utils';
 import type { TNode } from '../types/nodes';
 import Node from './Node';
 
@@ -9,13 +9,12 @@ const ItemList: FC = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await getParentNodes();
-        if (response?.status !== 200) {
-          console.log('Error, status code: ', response?.status);
+        const parentsRes = await getParentNodes();
+        if (parentsRes?.status !== 200) {
+          console.log('Error, status code: ', parentsRes?.status);
           return;
         }
-        console.log(response.data);
-        setNodesList(response.data);
+        setNodesList(parentsRes.data);
       } catch (err) {
         console.error(err);
       }
@@ -26,11 +25,9 @@ const ItemList: FC = () => {
   return (
     <div>
       {nodesList.length > 0 && (
-        <div className="flex flex-col items-center justify-center pb-10">
+        <div className='flex flex-col items-center justify-center pb-10'>
           {nodesList.map((node) => {
-            return (
-                <Node key={node.id} id={node.id} title={node.title} parent={node.parent} />
-            );
+            return <Node key={node.id} id={node.id} title={node.title} parent={node.parent} />;
           })}
         </div>
       )}
