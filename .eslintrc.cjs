@@ -39,7 +39,6 @@ const config = {
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',
-    '@typescript-eslint/no-misused-promises': 'off',
   },
 };
 

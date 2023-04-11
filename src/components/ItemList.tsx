@@ -26,7 +26,7 @@ const ItemList: FC = () => {
   return (
     <div>
       {nodesList.length > 0 && (
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
           {nodesList.map((node) => {
             return (
                 <Node key={node.id} id={node.id} title={node.title} parent={node.parent} />

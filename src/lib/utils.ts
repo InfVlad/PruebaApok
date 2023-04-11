@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError, isAxiosError } from 'axios';
 import type { TNode } from '../types/nodes';
 import type { Language } from '../types/local';
 
@@ -36,7 +36,11 @@ const getChildNodes = async (id: number) => {
     const response = await axios<TNode[]>(`${URL_BASE}/nodes?parent=${id}`);
     return response;
   } catch (err) {
-    console.error(err);
+    if (isAxiosError(err) && err.response?.status === 404) {
+      console.log((err.response?.data as { message: string })?.message);
+    } else {
+      console.error(err);
+    }
   }
 };
 
