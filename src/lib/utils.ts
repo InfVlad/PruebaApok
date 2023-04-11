@@ -1,4 +1,4 @@
-import axios, { AxiosError, isAxiosError } from 'axios';
+import axios, { isAxiosError } from 'axios';
 import type { TNode } from '../types/nodes';
 import type { Language } from '../types/local';
 
@@ -27,7 +27,11 @@ const deleteNode = async (id: number) => {
     const response = await axios.delete<TNode>(`${URL_BASE}/node/${id}`);
     return response;
   } catch (err) {
-    console.error(err);
+    if (isAxiosError(err) && err.response?.status === 400) {
+      console.log((err.response?.data as { message: string })?.message);
+    } else {
+      console.error(err);
+    }
   }
 };
 
