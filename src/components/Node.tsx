@@ -4,19 +4,24 @@ import { getChildNodes, createNode, deleteNode } from '../lib/utils';
 import type { TNode } from '../types/nodes';
 import deleteIcon from '../assets/delete.svg';
 import closeIcon from '../assets/close.svg';
+import Loader from './Loader';
 
 interface NodeProps extends TNode {
   setShowingChild?: React.Dispatch<React.SetStateAction<number | null>>;
+  updateChildList?: React.Dispatch<React.SetStateAction<TNode[]>>;
 }
 
-const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild }) => {
+const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildList }) => {
   const [childList, setChildList] = useState<TNode[]>([]);
   const [showingGrandChild, setShowingGrandChild] = useState<number | null>(null);
+  const [loadingChildren, setLoadingChildren] = useState<boolean>(false);
 
   const handleShowChildren: MouseEventHandler<HTMLButtonElement> = () => {
     void (async () => {
       try {
+        setLoadingChildren(true);
         const childNodes = await getChildNodes(id);
+        setLoadingChildren(false);
         if (!childNodes) return;
         setChildList(childNodes?.data);
         console.log(childNodes?.data);
@@ -55,6 +60,9 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild }) => {
           console.log('Status: ', deletedNodeRes.status);
         }
         console.log('Successfully deleted node ', deletedNodeRes?.data.id);
+        if (updateChildList) {
+          updateChildList((prevList) => prevList.filter((node) => node.id !== id));
+        }
       } catch (error) {
         console.error(error);
       }
@@ -67,10 +75,10 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className='flex flex-col items-center justify-between gap-4 p-8 m-8 bg-white w-72 h-[22rem] rounded-3xl'>
+    <div className='flex flex-col items-center justify-center'>
+      <div className='flex flex-col items-center justify-between gap-4 p-8 m-8 bg-white w-64 h-[20rem] sm:w-72 sm:h-[22rem] rounded-3xl'>
         <div className='flex items-start justify-between w-full gap-4'>
-          <div className="font-semibold text-blue-600 text-md">
+          <div className='font-semibold text-blue-600 text-md'>
             <div>{`ID: ${id}`}</div>
             {parent ? <div>{`Parent ID: ${parent}`}</div> : <div>Root</div>}
           </div>
@@ -78,28 +86,28 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild }) => {
             <button
               type='button'
               title='Delete Node'
-              className='w-8 h-8 p-1 border-2 border-[#ff3838] border-solid rounded-full'
+              className='w-8 h-8 p-1 border-2 border-[#ff3838] hover:border-red-700 border-solid rounded-full'
               onClick={handleDeleteNode}
             >
               <img src={deleteIcon} alt='trash' />
             </button>
           ) : null}
         </div>
-        <p className='w-[85%] text-center font-serif text-xl font-bold text-blue-600'>
+        <p className='w-[85%] text-center font-serif text-lg font-semibold sm:text-xl sm:font-bold text-blue-600'>
           {title}
         </p>
         <div className='flex items-center justify-between w-full gap-4'>
           <button
             type='button'
-            className='px-4 py-2 font-medium text-white transition-colors duration-500 bg-blue-600 border-2 rounded-2xl hover:bg-white hover:text-blue-600 hover:border-blue-600'
+            className='flex items-center justify-center sm:min-w-[97px] px-2 sm:px-4 py-2 font-medium text-white transition-colors duration-500 bg-blue-600 border-2 rounded-2xl hover:bg-white hover:text-blue-600 hover:border-blue-600'
             onClick={handleShowChildren}
             title='Show children nodes'
           >
-            Children
+            {loadingChildren ? <Loader /> : 'Children'}
           </button>
           <button
             type='button'
-            className='px-4 py-2 font-medium text-blue-600 transition-colors duration-500 border-2 border-blue-600 rounded-2xl hover:bg-blue-600 hover:text-white'
+            className='px-2 py-2 font-medium text-blue-600 transition-colors duration-500 border-2 border-blue-600 sm:px-4 rounded-2xl hover:bg-blue-600 hover:text-white'
             onClick={handleAddChild}
             title='Add new child node'
           >
@@ -122,6 +130,7 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild }) => {
                 title={title}
                 parent={parent}
                 setShowingChild={!setShowingChild ? setShowingGrandChild : undefined}
+                updateChildList={setChildList}
               />
             );
           })}
