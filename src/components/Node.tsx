@@ -65,12 +65,17 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
       }
     })();
   };
+  // normalmente se muestran todos los nodos hijos, pero al mostrarse los hijos de uno de ellos,
+  // se ocultan los "hermanos", quedando solo "Abuelo" > "Padre" > "Hijos"
+  // el algoritmo actual solo alcanza la tercera generacion,
+  // se pudiese utilizar un objeto en lugar de una unica variable para hacerlo infinito
   const renderChildrenList = () => {
     return showingGrandChild !== null
       ? childList.filter((node) => node.id === showingGrandChild)
       : childList;
   };
 
+  // Si se elimina el unico hijo que tiene un nodo, la ventana "children" debe cerrarse:
 useEffect(() => {
   if(childList.length === 0){
     setShowingGrandChild(null);
