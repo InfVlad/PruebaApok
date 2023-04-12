@@ -1,48 +1,26 @@
-import '@total-typescript/ts-reset';
 import type { FC, MouseEventHandler, Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 import { getNode } from '../lib/utils';
 import type { TNode } from '../types/nodes';
 import languageIcon from '../assets/language.svg';
 import type { AxiosResponse } from 'axios';
+import { languages } from '../lib/data';
 
-function isValidLocale(item: any): item is TLocales {
+type LanguagesList = typeof languages;
+type TLocales = LanguagesList[number]['locale'];
+const isValidLocale = (item: any): item is TLocales => {
   return typeof item === 'string';
 }
-type TLocales = LanguagesList[number]['locale'];
-type LanguagesList = typeof languages;
-const languages = [
-  {
-    locale: 'es_ES',
-    label: 'Español',
-    flagUrl: '/flags/spain.svg',
-  },
-  {
-    locale: 'fr_FR',
-    label: 'Français',
-    flagUrl: '/flags/france.svg',
-  },
-  {
-    locale: 'de_DE',
-    label: 'Deutsch',
-    flagUrl: '/flags/germany.svg',
-  },
-  {
-    locale: 'it_IT',
-    label: 'Italiano',
-    flagUrl: '/flags/italy.svg',
-  },
-] as const;
 
-interface LanguageSelectorProps {
-  id: number;
-  updateTitle: Dispatch<SetStateAction<string | null>>;
-}
 interface Language {
   title: string;
   locale: string;
   label: string;
   flagUrl: string;
+}
+interface LanguageSelectorProps {
+  id: number;
+  updateTitle: Dispatch<SetStateAction<string | null>>;
 }
 
 const LanguageSelector: FC<LanguageSelectorProps> = ({ id, updateTitle }) => {
@@ -101,7 +79,6 @@ const LanguageSelector: FC<LanguageSelectorProps> = ({ id, updateTitle }) => {
   const handleSelectTranslation = (title: string | null) => {
     updateTitle(title)
   }
-
 
   return (
     <div>

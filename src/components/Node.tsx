@@ -1,11 +1,11 @@
 import type { FC, MouseEventHandler, Dispatch, SetStateAction } from 'react';
 import { useState, useEffect } from 'react';
-import { getChildNodes, createNode, deleteNode } from '../lib/utils';
+import { getChildNodes, deleteNode } from '../lib/utils';
 import type { TNode } from '../types/nodes';
-import type { Language } from '../types/local';
 import deleteIcon from '../assets/delete.svg';
 import closeIcon from '../assets/close.svg';
 import Loader from './Loader';
+import CreateNode from './CreateNode';
 import { toast } from 'react-hot-toast';
 import {useAutoAnimate} from '@formkit/auto-animate/react'
 import LanguageSelector from './LanguageSelector';
@@ -19,6 +19,7 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
   const [childList, setChildList] = useState<TNode[]>([]);
   const [showingGrandChild, setShowingGrandChild] = useState<number | null>(null);
   const [loadingChildren, setLoadingChildren] = useState<boolean>(false);
+  const [addingChild, setAddingChild] = useState<boolean>(false);
   const [translatedTitle, setTranslatedTitle] = useState<string | null>(null);
   const [listRef] = useAutoAnimate<HTMLDivElement>();
 
@@ -45,17 +46,7 @@ const Node: FC<NodeProps> = ({ id, title, parent, setShowingChild, updateChildLi
     }
   };
   const handleAddChild: MouseEventHandler<HTMLButtonElement> = () => {
-    void (async () => {
-      try {
-        const createdNodeRes = await createNode(id);
-        if (createdNodeRes) {
-          toast.success("Node Created Successfully")
-          toast.success(`Node number: ${createdNodeRes?.data.id}`);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    })();
+    setAddingChild(true);
   };
   const handleDeleteNode: MouseEventHandler<HTMLButtonElement> = () => {
     void (async () => {
@@ -91,7 +82,7 @@ useEffect(() => {
 
   return (
     <div className='flex flex-col items-center justify-center'>
-      <div className='flex flex-col items-center justify-between gap-4 p-8 m-8 bg-white w-64 h-[20rem] sm:w-72 sm:h-[22rem] rounded-3xl'>
+      <div className='flex flex-col items-center justify-between gap-4 p-8 m-8 bg-white w-64 min-h-[20rem] sm:w-72 sm:min-h-[22rem] rounded-3xl'>
         <div className='flex items-start justify-between w-full gap-4'>
           <div className='font-semibold text-blue-600 text-md'>
             <div>{`ID: ${id}`}</div>
@@ -109,7 +100,7 @@ useEffect(() => {
             </button>
           ) : null}
         </div>
-        <p className='w-[85%] text-center font-serif text-lg font-semibold sm:text-xl sm:font-bold text-blue-600'>
+        <p className='w-[85%] text-center font-serif text-lg font-semibold sm:text-xl sm:font-bold text-blue-600 mt-4 mb-10'>
           {translatedTitle? translatedTitle: title}
         </p>
         <div className='flex items-center justify-between w-full gap-4'>
@@ -130,6 +121,7 @@ useEffect(() => {
             Add Child
           </button>
         </div>
+        {addingChild && <CreateNode id={id} show={setAddingChild} />}
       </div>
       {childList.length > 0 && (
         <div

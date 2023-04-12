@@ -61,7 +61,7 @@ const getNode = async (id: number, locale?: string) => {
   }
 };
 
-const createNode = async (parentId: number, locales?: string[]) => {
+const createNode = async (parentId: number, locales: string[] = []) => {
   try {
     const response = await axios.post<TNode>(`${URL_BASE}/node`, {
       parent: parentId,
